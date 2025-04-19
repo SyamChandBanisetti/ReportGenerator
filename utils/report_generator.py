@@ -1,9 +1,11 @@
-from fpdf import FPDF
 import pdfkit
 
-def generate_html_report(name, email, answers, scores, tasks, kaggle_subs, leetcode_subs):
+def generate_html_report(student_name, email, answers, scores, tasks, kaggle_subs, leetcode_subs):
+    """
+    Generate an HTML report string for the student.
+    """
     html = f"""
-    <h2>Student Report: {name}</h2>
+    <h2>Student Report: {student_name}</h2>
     <p><strong>Email:</strong> {email}</p>
 
     <h3>🧾 Submission Summary</h3>
@@ -26,7 +28,11 @@ def generate_html_report(name, email, answers, scores, tasks, kaggle_subs, leetc
     """
     return html
 
+
 def export_to_pdf(html_content):
-    # Convert HTML to PDF using pdfkit
+    """
+    Convert HTML content to PDF using pdfkit.
+    """
+    # Convert HTML to PDF using pdfkit (You may need to install wkhtmltopdf on your system)
     pdf = pdfkit.from_string(html_content, False)  # False to return bytes instead of saving
     return pdf

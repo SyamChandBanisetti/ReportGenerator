@@ -7,45 +7,40 @@ from utils.leetcode_fetcher import fetch_leetcode_data
 
 st.set_page_config(page_title="Student Report Analyzer", layout="wide")
 
-st.title("📊 Student Report Analyzer")
+st.title("📊 Student Submission Analyzer")
 
-uploaded_file = st.file_uploader("Upload the Excel file", type=["xlsx"])
-student_name = st.text_input("Enter Student Name")
+uploaded_file = st.file_uploader("Upload Student Excel File", type=["xlsx"])
 
-if uploaded_file and student_name:
+if uploaded_file:
     try:
         df = pd.read_excel(uploaded_file)
 
-        # Extract LeetCode username if present
-        leetcode_username = df.iloc[0].get("LeetCode Username", None)
+        if "Name" not in df.columns:
+            st.error("The uploaded file must contain a 'Name' column.")
+        else:
+            student_names = df["Name"].dropna().unique().tolist()
+            selected_student = st.selectbox("Select a student to generate report", student_names)
 
-        # Generate HTML Report
-        html_report, precision_score, recall_score, f1_score = generate_html_report(df, student_name)
+            if st.button("Generate Report"):
+                student_data = df[df["Name"] == selected_student]
 
-        # Fetch LeetCode stats if username is provided
-        leetcode_info = ""
-        if leetcode_username:
-            try:
-                stats = fetch_leetcode_data(leetcode_username)
-                leetcode_info += f"💡 LeetCode Stats for `{leetcode_username}`\n"
-                leetcode_info += f"- Total Problems Solved: {stats['totalSolved']}\n"
-                leetcode_info += f"- Easy: {stats['easySolved']}, Medium: {stats['mediumSolved']}, Hard: {stats['hardSolved']}\n"
-                leetcode_info += f"- Ranking: {stats['ranking']}"
-                st.markdown(leetcode_info)
-            except:
-                st.warning("Could not fetch LeetCode stats.")
+                if student_data.empty:
+                    st.warning("No data found for the selected student.")
+                else:
+                    # Extract LeetCode username (if available)
+                    leetcode_username = student_data.iloc[0].get("Leetcode", "")
+                    leetcode_stats = None
+                    if pd.notna(leetcode_username) and leetcode_username.strip():
+                        try:
+                            leetcode_stats = fetch_leetcode_data(leetcode_username.strip())
+                        except Exception as e:
+                            st.warning(f"Could not fetch LeetCode data: {e}")
 
-        st.markdown("---")
-        st.markdown("### 🧾 Generated Report")
-        st.components.v1.html(html_report, height=700, scrolling=True)
+                    # Generate HTML report
+                    html_report = generate_html_report(student_data, leetcode_stats)
 
-        st.markdown("### 🧮 Evaluation Metrics")
-        st.write(f"- **Precision**: {precision_score}")
-        st.write(f"- **Recall**: {recall_score}")
-        st.write(f"- **F1 Score**: {f1_score}")
+                    # Display report in browser
+                    st.components.v1.html(html_report, height=600, scrolling=True)
 
     except Exception as e:
-        st.error(f"❌ Error processing the uploaded file. Make sure it's in the correct format.\n\nDetails: {str(e)}")
-
-st.markdown("---")
-st.caption("Made with ❤️ using Streamlit")
+        st.error(f"Something went wrong: {e}")

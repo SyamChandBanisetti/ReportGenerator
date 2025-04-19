@@ -1,4 +1,7 @@
-from weasyprint import HTML
+# Remove this line (pdfkit import)
+# import pdfkit
+
+from weasyprint import HTML  # Keep only WeasyPrint import
 
 def export_to_pdf(html_content):
     """

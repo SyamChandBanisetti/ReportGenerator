@@ -1,21 +1,18 @@
+# leetcode_fetcher.py
 import requests
 
 def fetch_leetcode_stats(username):
     """
-    Fetch the number of submissions made by the student on LeetCode.
+    Fetches the number of Leetcode submissions made by the given user.
+    Returns the number of submissions.
     """
     url = f"https://leetcode.com/{username}/"
+    response = requests.get(url)
     
-    try:
-        response = requests.get(url)
-        response.raise_for_status()
-        
-        # Extracting the number of submissions from the HTML page
-        submissions_section = response.text.split('submissions={')[1].split('}')[0]
-        submissions_data = eval(f"{{{submissions_section}}}")  # Convert to dictionary
-        total_submissions = submissions_data.get('total', 0)
-        
-        return total_submissions
-    except Exception as e:
-        print(f"Error fetching LeetCode data: {e}")
-        return 0  # Return 0 if there is an issue
+    if response.status_code == 200:
+        # Scraping the number of problems solved from the user's profile page
+        solved = response.text.split('class="total-solved-problems"')[1]
+        solved = solved.split('<span>')[1].split('</span>')[0]
+        return int(solved)
+    else:
+        return 0

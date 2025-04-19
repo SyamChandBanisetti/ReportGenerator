@@ -1,57 +1,45 @@
-# report_generator.py
-import weasyprint
-
-def generate_html_report(student_name, email, answers, scores, task_status, kaggle_submissions, leetcode_submissions):
-    """
-    Generates an HTML report based on student information, answers, scores, task status, and submissions.
-    """
-    html_content = f"""
+def generate_html_report(results, student_name):
+    html = f"""
     <html>
-        <head><title>Student Report for {student_name}</title></head>
-        <body>
-            <h1>Report for {student_name}</h1>
-            <p>Email: {email}</p>
-            <h2>Answers</h2>
-            <ul>
-    """
-    
-    for question, answer in answers.items():
-        html_content += f"<li><b>{question}:</b> {answer}</li>"
-    
-    html_content += """
-            </ul>
-            <h2>Scores</h2>
-            <ul>
-    """
-    
-    for question, score in scores.items():
-        html_content += f"<li><b>{question}:</b> {score}/5</li>"
-    
-    html_content += """
-            </ul>
-            <h2>Task Status</h2>
-            <ul>
-    """
-    
-    for task, status in task_status.items():
-        status_str = "Completed" if status else "Not Completed"
-        html_content += f"<li><b>{task}:</b> {status_str}</li>"
-    
-    html_content += f"""
-            </ul>
-            <h2>Kaggle Submissions</h2>
-            <p>{kaggle_submissions} Kaggle submissions uploaded.</p>
-            <h2>Leetcode Submissions</h2>
-            <p>{leetcode_submissions} Leetcode problems solved.</p>
-        </body>
+    <head>
+        <style>
+            body {{
+                font-family: Arial, sans-serif;
+                padding: 20px;
+                background-color: #f9f9f9;
+            }}
+            h1 {{
+                color: #333;
+            }}
+            table {{
+                border-collapse: collapse;
+                width: 100%;
+                margin-top: 20px;
+            }}
+            th, td {{
+                border: 1px solid #ccc;
+                padding: 8px;
+                text-align: left;
+            }}
+            th {{
+                background-color: #eee;
+            }}
+            .score {{
+                font-weight: bold;
+            }}
+        </style>
+    </head>
+    <body>
+        <h1>Formula Evaluation Report for {student_name}</h1>
+        <table>
+            <tr><th>Metric</th><th>Correct</th><th>Score</th></tr>
+            <tr><td>Accuracy</td><td>{results['Accuracy']['correct']}</td><td>{results['Accuracy']['score']}</td></tr>
+            <tr><td>Precision</td><td>{results['Precision']['correct']}</td><td>{results['Precision']['score']}</td></tr>
+            <tr><td>Recall</td><td>{results['Recall']['correct']}</td><td>{results['Recall']['score']}</td></tr>
+            <tr><td>F1-Score</td><td>{results['F1']['correct']}</td><td>{results['F1']['score']}</td></tr>
+            <tr><td colspan="2" class="score">Total Score</td><td class="score">{results['Total']}</td></tr>
+        </table>
+    </body>
     </html>
     """
-    return html_content
-
-def export_to_pdf(html_content):
-    """
-    Converts HTML content to a PDF and returns the PDF as bytes.
-    Uses WeasyPrint for the conversion.
-    """
-    pdf = weasyprint.HTML(string=html_content).write_pdf()
-    return pdf
+    return html

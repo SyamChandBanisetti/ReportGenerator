@@ -23,7 +23,7 @@ def generate_html_report(student_name, email, answers, scores, tasks, kaggle_sub
 
     <h3>✅ Task Completion</h3>
     <ul>
-    {''.join([f'<li>{\"✅\" if done else \"❌\"} {task}</li>' for task, done in tasks.items()])}
+    {''.join([f'<li>{"✅" if done else "❌"} {task}</li>' for task, done in tasks.items()])}
     </ul>
     """
     return html
@@ -33,6 +33,6 @@ def export_to_pdf(html_content):
     """
     Convert HTML content to PDF using pdfkit.
     """
-    # Convert HTML to PDF using pdfkit (You may need to install wkhtmltopdf on your system)
+    # Convert HTML to PDF using pdfkit (Ensure wkhtmltopdf is installed on your system)
     pdf = pdfkit.from_string(html_content, False)  # False to return bytes instead of saving
     return pdf

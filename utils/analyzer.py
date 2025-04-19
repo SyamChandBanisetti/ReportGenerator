@@ -1,16 +1,19 @@
-from sklearn.metrics.pairwise import cosine_similarity
-from sklearn.feature_extraction.text import TfidfVectorizer
+# analyzer.py
 
-def score_answer(student_answer, correct_answer):
+def score_answer(answer, formula_type):
     """
-    Score the student's answer based on cosine similarity to the correct answer.
+    This function scores the answer for the Precision, Recall, and F1 Score questions.
+    It looks for relevant keywords and gives a score based on how well the answer matches.
     """
-    # Use TF-IDF vectorization to convert text to vectors
-    vectorizer = TfidfVectorizer().fit_transform([student_answer, correct_answer])
-    
-    # Calculate cosine similarity between student answer and correct answer
-    similarity_matrix = cosine_similarity(vectorizer[0:1], vectorizer[1:2])
-    
-    # The cosine similarity score ranges from 0 to 1; we scale it to be between 0 and 5
-    score = similarity_matrix[0][0] * 5  # Scaling the similarity to a 5-point scale
-    return round(score, 2)
+    if formula_type == "Precision":
+        correct_keywords = ["true positive", "false positive", "positive"]
+        score = sum(keyword in answer.lower() for keyword in correct_keywords)
+    elif formula_type == "Recall":
+        correct_keywords = ["true positive", "false negative", "positive"]
+        score = sum(keyword in answer.lower() for keyword in correct_keywords)
+    elif formula_type == "F1 Score":
+        correct_keywords = ["precision", "recall", "harmonic mean"]
+        score = sum(keyword in answer.lower() for keyword in correct_keywords)
+    else:
+        score = 0
+    return score

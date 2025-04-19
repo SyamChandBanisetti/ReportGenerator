@@ -1,23 +1,57 @@
-# Remove this line (pdfkit import)
-# import pdfkit
+# report_generator.py
+import weasyprint
 
-from weasyprint import HTML  # Keep only WeasyPrint import
+def generate_html_report(student_name, email, answers, scores, task_status, kaggle_submissions, leetcode_submissions):
+    """
+    Generates an HTML report based on student information, answers, scores, task status, and submissions.
+    """
+    html_content = f"""
+    <html>
+        <head><title>Student Report for {student_name}</title></head>
+        <body>
+            <h1>Report for {student_name}</h1>
+            <p>Email: {email}</p>
+            <h2>Answers</h2>
+            <ul>
+    """
+    
+    for question, answer in answers.items():
+        html_content += f"<li><b>{question}:</b> {answer}</li>"
+    
+    html_content += """
+            </ul>
+            <h2>Scores</h2>
+            <ul>
+    """
+    
+    for question, score in scores.items():
+        html_content += f"<li><b>{question}:</b> {score}/5</li>"
+    
+    html_content += """
+            </ul>
+            <h2>Task Status</h2>
+            <ul>
+    """
+    
+    for task, status in task_status.items():
+        status_str = "Completed" if status else "Not Completed"
+        html_content += f"<li><b>{task}:</b> {status_str}</li>"
+    
+    html_content += f"""
+            </ul>
+            <h2>Kaggle Submissions</h2>
+            <p>{kaggle_submissions} Kaggle submissions uploaded.</p>
+            <h2>Leetcode Submissions</h2>
+            <p>{leetcode_submissions} Leetcode problems solved.</p>
+        </body>
+    </html>
+    """
+    return html_content
 
 def export_to_pdf(html_content):
     """
-    Convert HTML content to PDF using WeasyPrint.
-    This function takes an HTML string and returns the PDF as bytes.
-
-    Args:
-    - html_content (str): The HTML content to be converted into a PDF.
-
-    Returns:
-    - pdf (bytes): The generated PDF in byte format.
+    Converts HTML content to a PDF and returns the PDF as bytes.
+    Uses WeasyPrint for the conversion.
     """
-    try:
-        # Convert HTML string to PDF using WeasyPrint
-        pdf = HTML(string=html_content).write_pdf()
-        return pdf
-    except Exception as e:
-        print(f"Error converting HTML to PDF: {e}")
-        raise
+    pdf = weasyprint.HTML(string=html_content).write_pdf()
+    return pdf

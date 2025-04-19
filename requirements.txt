@@ -3,4 +3,4 @@ pandas
 weasyprint
 openpyxl
 requests
-cffi  # WeasyPrint's dependency
+cffi  # Required by WeasyPrint
